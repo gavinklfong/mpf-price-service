@@ -85,13 +85,11 @@ functions:
     description: Save MPF price from SQS to DynamoDB
     memorySize: 128
     events:
-      # - sqs:
-      #   arn:
-      #     Fn::GetAtt:
-      #       - mpfPriceQueue
-      #       - Arn
-      - sqs: arn:aws:sqs:us-east-2:041740121314:${self:service}-mpf-price-queue-${self:provider.stage}
-        # arn: arn:aws:sqs:us-east-2:041740121314:${self:service}-mpf-price-queue-${self:provider.stage}
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - mpfPriceQueue
+              - Arn
         batchSize: 10
     package:
       include:
