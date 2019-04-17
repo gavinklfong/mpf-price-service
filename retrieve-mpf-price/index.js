@@ -13,7 +13,7 @@ const SqsWriteStream = require('./sqs-write-stream');
 
 const s3 = new aws.S3();
 
-const DEFAULT_SQS_URL = 'https://sqs.us-east-2.amazonaws.com/041740121314/MPFPriceQueue';
+const DEFAULT_SQS_QUEUE_NAME = 'mpf-price-service-mpf-price-queue-dev';
 
 exports.handler = async (event) => {
 
@@ -71,14 +71,18 @@ async function retrieveMPFPrice(startDate, endDate) {
 
 function initSqsWriteStream () {
 
-  let sqsUrl = process.env.SQS_URL;
+  let queueName = process.env.SQS_QUEUE_NAME;
 
-  if (!sqsUrl) {
-    sqsUrl = DEFAULT_SQS_URL;
+  if (!queueName) {
+    console.log("QueueName in environment variable is empty, use default value"); 
+
+    queueName = DEFAULT_SQS_QUEUE_NAME;
   }
 
+  console.log("QueueName: " + queueName); 
+
   let sqsStream = new SqsWriteStream(
-    {url: sqsUrl},
+    {name: queueName},
     {batchSize: 10}
   );
   

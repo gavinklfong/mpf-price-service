@@ -23,6 +23,11 @@ resources:
         Name: retrieveMPFPriceArn
       Value:
          Fn::GetAtt: RetrieveMPFPriceLambdaFunction.Arn
+    mpfPriceQueue:
+      Export:
+        Name: mpfPriceQueueName
+      Value:
+         Fn::GetAtt: mpfPriceQueue.QueueName
 
 # Provider
 
@@ -121,7 +126,11 @@ functions:
       - schedule: 
           rate: cron(0 18 */7 * ? *)
           enabled: true
-
+    environment:
+      SQS_QUEUE_NAME:
+        Fn::GetAtt:
+          - mpfPriceQueue
+          - QueueName
 
   saveMPFPriceDynamodb:
     handler: save-mpf-price-dynamodb/index.handler
