@@ -1,4 +1,4 @@
-var aws = require('aws-sdk');
+const aws = require('aws-sdk');
 aws.config.update({region: 'us-east-2'});
 
 // aws.config.update({
@@ -6,8 +6,10 @@ aws.config.update({region: 'us-east-2'});
 //   endpoint: "http://localhost:8000"
 // });
 
-var dynamodb = new aws.DynamoDB;
-var docClient = new aws.DynamoDB.DocumentClient();
+const dynamodb = new aws.DynamoDB;
+const docClient = new aws.DynamoDB.DocumentClient();
+
+const DEFAULT_DYNAMODB_TABLE_NAME = "MPFPriceDaily";
 
 exports.handler = async (event) => {
 
@@ -39,12 +41,17 @@ exports.handler = async (event) => {
 
 async function saveFundPrice(fundPriceRecord) {
 
-  if (!fundPriceRecord.id) {
-      fundPriceRecord.id = fundPriceRecord.trustee + "-" + fundPriceRecord.fundName + "-" + fundPriceRecord.priceDate;
+  let tableName = process.env.DYNAMODB_TABLE_NAME;
+  if (!tableName) {
+      tableName = DEFAULT_DYNAMODB_TABLE_NAME;
+  }
+
+  if (!fundPriceRecord.trusteeSchemeFundId) {
+      fundPriceRecord.trusteeSchemeFundId = fundPriceRecord.trustee + "-" + fundPriceRecord.scheme + "-" + fundPriceRecord.fundName;
   }
 
   let params = {
-      TableName: 'MPFPriceDaily',
+      TableName: tableName,
       Item: fundPriceRecord
   };
   console.log("Calling PutItem");
@@ -59,7 +66,7 @@ async function saveFundPrice(fundPriceRecord) {
           }
           else { 
               console.log("PutItem returned successfully");
-              resolve(fundPriceRecord.id);
+              resolve(fundPriceRecord.trusteeSchemeFundId);
           }
       });
   });

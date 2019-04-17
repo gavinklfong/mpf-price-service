@@ -12,6 +12,17 @@ resources:
       Properties:
         QueueName: ${self:service}-mpf-price-queue-${self:provider.stage}
         VisibilityTimeout: 300
+  Outputs:
+    saveMPFPriceDynamodbArn:
+      Export:
+        Name: saveMPFPriceDynamodbArn
+      Value:
+         Fn::GetAtt: SaveMPFPriceDynamodbLambdaFunction.Arn
+    retrieveMPFPriceArn:
+      Export:
+        Name: retrieveMPFPriceArn
+      Value:
+         Fn::GetAtt: RetrieveMPFPriceLambdaFunction.Arn
 
 # Provider
 
@@ -72,6 +83,33 @@ package:
 # Lambda definition
 
 functions:
+
+  # mpfPriceRetrievalScheduler:
+  #   handler: mpf-price-retrieval-scheduler/index.handler
+  #   description: The scheduler for MPF price retrieval
+  #   memorySize: 128
+  #   environment:
+  #     RETRIEVE_MPF_PRICE_LAMBDA_ID: ${cf:mpf-price-service.retrieveMPFPriceArn}
+  #   package:
+  #     include:
+  #       - mpf-price-retrieval-scheduler/**   
+  #   events:
+  #     - schedule:
+  #       rate: rate(7 days)
+  #       enable: true
+
+  # hello:
+  #   handler: hello/index.handler
+  #   description: hello test
+  #   memorySize: 128
+  #   package:
+  #     include:
+  #       - hello/**
+  #   events:
+  #     - schedule: 
+  #         rate: cron(*/1 * * * ? *)
+  #         enabled: true
+
   retrieveMPFPrice:
     handler: retrieve-mpf-price/index.handler
     description: Retrieve MPF price from API and feed to SQS
@@ -79,6 +117,11 @@ functions:
     package:
       include:
         - retrieve-mpf-price/**
+    events:
+      - schedule: 
+          rate: cron(0 18 */7 * ? *)
+          enabled: true
+
 
   saveMPFPriceDynamodb:
     handler: save-mpf-price-dynamodb/index.handler
@@ -94,3 +137,4 @@ functions:
     package:
       include:
         - save-mpf-price-dynamodb/**
+

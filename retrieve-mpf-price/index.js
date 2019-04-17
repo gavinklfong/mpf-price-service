@@ -6,33 +6,49 @@ const axios = require('axios');
 
 const fundConfig = require('./config.json');
 
-var aws = require('aws-sdk');
+const aws = require('aws-sdk');
 aws.config.update({region: 'us-east-2'});
 
 const SqsWriteStream = require('./sqs-write-stream');
 
+const s3 = new aws.S3();
 
-var s3 = new aws.S3();
-
+const DEFAULT_SQS_URL = 'https://sqs.us-east-2.amazonaws.com/041740121314/MPFPriceQueue';
 
 exports.handler = async (event) => {
 
-    console.log("SQS event received");
-    console.log(JSON.stringify((event)));
+    if (!event || !(event.Records)) {
 
-    for (let eventRecord of event.Records) {   
-        try {
-              if (eventRecord.eventSource == "aws:sqs") {
-              
-                    const message = JSON.parse(eventRecord.body);
-                    console.log("Message: " + JSON.stringify(message));                    
-                    await retrieveMPFPrice(message.startDate, message.endDate);
-              }
-        
-        } catch (e) {
-            console.error(e);
-        }
-    } 
+      console.log("Triggered by scheduler")
+
+      let startDate = moment().subtract(3, 'weeks').startOf('day');
+      let endDate = moment().subtract(1, 'weeks').startOf('day');
+  
+      try {
+        await retrieveMPFPrice(startDate, endDate);
+      } catch (e) {
+        console.error(e);
+        throw e;
+      }
+    } else {
+
+      console.log("Triggered by sqs");
+
+      for (let eventRecord of event.Records) {   
+          try {
+                if (eventRecord.eventSource == "aws:sqs") {
+                
+                      const message = JSON.parse(eventRecord.body);
+                      console.log("Message: " + JSON.stringify(message));                    
+                      await retrieveMPFPrice(message.startDate, message.endDate);
+                }
+          
+          } catch (e) {
+              console.error(e);
+              throw e;
+          }
+      } 
+    }
 };
 
 async function retrieveMPFPrice(startDate, endDate) {
@@ -44,39 +60,52 @@ async function retrieveMPFPrice(startDate, endDate) {
   
     let url = util.format(fundConfig.url, fundConfig.funds[i], startDate, endDate);
   
-    console.log(url);
+    console.log('retrieve MPF price from: ' + url);
   
     let response = await axios.get(url);
-    // console.log(response.data);
-     await parseCSV(response.data);
+     await parseCSVToSqs(response.data);
     
   }
 
 }
 
-async function parseCSV(content) {
+function initSqsWriteStream () {
 
-  let sqs = new SqsWriteStream(
-    {url: "https://sqs.us-east-2.amazonaws.com/041740121314/MPFPriceQueue"},
+  let sqsUrl = process.env.SQS_URL;
+
+  if (!sqsUrl) {
+    sqsUrl = DEFAULT_SQS_URL;
+  }
+
+  let sqsStream = new SqsWriteStream(
+    {url: sqsUrl},
     {batchSize: 10}
   );
   
-  sqs.on("msgReceived", (data) => {
+  sqsStream.on("Sqs msgReceived", (data) => {
         console.log("sqs msgReceived: " + JSON.stringify(data));
   });
   
-  sqs.on("msgProcessed", (data) => {
+  sqsStream.on("Sqs msgProcessed", (data) => {
         console.log("sqs msgProcessed: " + JSON.stringify(data));
   });
   
   let sqsEnd = new Promise(function(resolve, reject) {
-    sqs.on('finish', () => {
+    sqsStream.on('finish', () => {
       console.log('All SQS writes are now complete.');
       resolve("Finished");
     });
-    sqs.on('error', reject); 
+    sqsStream.on('error', reject); 
   });
 
+  let sqsWriteStream = {stream: sqsStream, finishPromise: sqsEnd};
+
+  return sqsWriteStream;
+}
+
+async function parseCSVToSqs(content) {
+
+  let sqsStream = initSqsWriteStream();
 
   let fundName = '';
   let isHeader = true;
@@ -92,30 +121,21 @@ async function parseCSV(content) {
 
     if (isHeader) {
           fundName = record[0];
-          fundName = fundName.replace(/[^\x00-\x7F]/g,"");
+          fundName = fundName.replace(/[^\x00-\x7F]/g,"");  // remove non-displayable character
           isHeader = false;
           return null;
     } else {
           let priceDate = moment(record[0], "YYYY-MM-DD");
-          let recordJson = {"trustee": "HSBC", "fundName": fundName, "priceDate": priceDate.startOf("date").valueOf(), "priceDateDisplay": record[0], "price": record[1]};
+          let recordJson = {"trustee": "HSBC", "scheme": "SuperTrust Plus", "fundName": fundName, "priceDate": priceDate.startOf("date").valueOf(), "priceDateDisplay": priceDate.format("YYYY-MM-DD"), "price": record[1]};
           console.log("In Transform: data: " + JSON.stringify(recordJson));
           return recordJson;
     }
         
   }))
-  // .pipe(csv.stringify())
-  // .pipe(process.stdout);
-  .pipe(sqs);
+  .pipe(sqsStream.stream);
 
-  let sqsEndResult = await sqsEnd;
+  await sqsStream.finishPromise;
 
-  console.log("pipeline completed");
-
-  const response = {
-    statusCode: 200,
-    body: JSON.stringify('Completed'),
-  };
-  return response;
 }
 
 

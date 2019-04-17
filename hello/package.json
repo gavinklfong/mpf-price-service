@@ -1,0 +1,19 @@
+{
+  "name": "hello",
+  "version": "0.0.1",
+  "description": "Hello",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "gavinklfong",
+  "license": "ISC",
+  "bugs": {
+    "url": ""
+  },
+  "homepage": "",
+  "dependencies": {
+    "aws-sdk": "^2.432.0"
+  }
+}
