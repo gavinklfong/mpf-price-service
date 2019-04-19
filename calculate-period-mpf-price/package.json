@@ -14,6 +14,7 @@
   },
   "homepage": "",
   "dependencies": {
-    "aws-sdk": "^2.432.0"
+    "aws-sdk": "^2.432.0",
+    "moment": "^2.24.0"
   }
 }

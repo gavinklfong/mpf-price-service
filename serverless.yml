@@ -76,8 +76,20 @@ provider:
           - - arn:aws:dynamodb
             - Ref: AWS::Region
             - Ref: AWS::AccountId
-            - table/MPFPriceDaily
-
+            - table/MPFPrice*
+    - Effect: "Allow"
+      Action:
+          - "dynamodb:DescribeStream"
+          - "dynamodb:GetRecords"
+          - "dynamodb:GetShardIterator"
+          - "dynamodb:ListStreams"
+      Resource: 
+        Fn::Join:
+          - ":"
+          - - arn:aws:dynamodb
+            - Ref: AWS::Region
+            - Ref: AWS::AccountId
+            - table/MPFPriceDaily/stream/2019-04-17T15:42:02.033
 # Package
 
 package:
@@ -147,3 +159,15 @@ functions:
       include:
         - save-mpf-price-dynamodb/**
 
+  calculateMPFPricePeriod:
+    handler: calculate-period-mpf-price/index.handler
+    description: Calcuate MPF price over weekly and monthly period
+    memorySize: 128
+    events:
+      - stream: 
+          arn: arn:aws:dynamodb:us-east-2:041740121314:table/MPFPriceDaily/stream/2019-04-17T15:42:02.033
+          batchSize: 20
+          startingPosition: LATEST
+    package:
+      include:
+        - calculate-period-mpf-price/**
