@@ -12,6 +12,51 @@ resources:
       Properties:
         QueueName: ${self:service}-mpf-price-queue-${self:provider.stage}
         VisibilityTimeout: 300
+    mpfPriceWeeklyUpdateQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: ${self:service}-mpf-price-weekly-update-queue-${self:provider.stage}
+        VisibilityTimeout: 300
+    mpfPriceMonthlyUpdateQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: ${self:service}-mpf-price-monthly-update-queue-${self:provider.stage}
+        VisibilityTimeout: 300
+    # mpfDailyPriceUpdatedTopic:
+    #   Type: "AWS::SNS::Topic"
+    #   Properties:
+    #     DisplayName: MPF Price Daily Updated Topic
+    #     TopicName: ${self:service}-mpf-daily-price-updated-${self:provider.stage}
+    
+    # snsToMonthlyUpdateQueuePolicy:
+    #   Type: AWS::SQS::QueuePolicy
+    #   Properties:
+    #     PolicyDocument:
+    #       Version: "2012-10-17"
+    #       Statement:
+    #         - Sid: "allow-sns-messages"
+    #           Effect: Allow
+    #           Principal: "*"
+    #           Resource: !GetAtt
+    #             - mpfPriceMonthlyUpdateQueue
+    #             - Arn
+    #           Action: "SQS:SendMessage"
+    #           Condition:
+    #             ArnEquals:
+    #               "aws:SourceArn": !Ref mpfDailyPriceUpdatedTopic
+    #     Queues:
+    #       - Ref: mpfPriceMonthlyUpdateQueue
+          
+    # mpfPriceMonthlyUpdateQueueSubscription:
+    #   Type: 'AWS::SNS::Subscription'
+    #   Properties:
+    #     TopicArn: !Ref mpfDailyPriceUpdatedTopic
+    #     Endpoint: !GetAtt
+    #       - mpfPriceMonthlyUpdateQueue
+    #       - Arn
+    #     Protocol: sqs
+    #     RawMessageDelivery: 'true'
+
   Outputs:
     saveMPFPriceDynamodbArn:
       Export:
@@ -56,6 +101,36 @@ provider:
       Resource:
         Fn::GetAtt:
           - mpfPriceQueue
+          - Arn
+    - Effect: "Allow"
+      Action:
+          - "sqs:DeleteMessage"
+          - "sqs:GetQueueUrl"
+          - "sqs:ChangeMessageVisibility"
+          - "sqs:DeleteMessageBatch"
+          - "sqs:SendMessageBatch"
+          - "sqs:ReceiveMessage"
+          - "sqs:SendMessage"
+          - "sqs:GetQueueAttributes"
+          - "sqs:ChangeMessageVisibilityBatch"
+      Resource:
+        Fn::GetAtt:
+          - mpfPriceWeeklyUpdateQueue
+          - Arn
+    - Effect: "Allow"
+      Action:
+          - "sqs:DeleteMessage"
+          - "sqs:GetQueueUrl"
+          - "sqs:ChangeMessageVisibility"
+          - "sqs:DeleteMessageBatch"
+          - "sqs:SendMessageBatch"
+          - "sqs:ReceiveMessage"
+          - "sqs:SendMessage"
+          - "sqs:GetQueueAttributes"
+          - "sqs:ChangeMessageVisibilityBatch"
+      Resource:
+        Fn::GetAtt:
+          - mpfPriceMonthlyUpdateQueue
           - Arn
     - Effect: "Allow"
       Action:
@@ -159,15 +234,68 @@ functions:
       include:
         - save-mpf-price-dynamodb/**
 
-  calculateMPFPricePeriod:
-    handler: calculate-period-mpf-price/index.handler
-    description: Calcuate MPF price over weekly and monthly period
+  # calculateMPFPricePeriod:
+  #   handler: calculate-period-mpf-price/index.handler
+  #   description: Calcuate MPF price over weekly and monthly period
+  #   memorySize: 128
+  #   events:
+  #     - stream: 
+  #         arn: arn:aws:dynamodb:us-east-2:041740121314:table/MPFPriceDaily/stream/2019-04-17T15:42:02.033
+  #         batchSize: 20
+  #         startingPosition: LATEST
+  #   package:
+  #     include:
+  #       - calculate-period-mpf-price/**
+  #   environment:
+  #     MONTHLY_PRICE_QUEUE:
+  #       Fn::GetAtt:
+  #         - mpfPriceMonthlyUpdateQueue
+  #         - QueueName
+
+  calculateWeeklyAverageMPFPrice:
+    handler: calculate-weekly-mpf-price/index.handler
+    description: Calculate weekly average MPF price
+    memorySize: 128
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - mpfPriceWeeklyUpdateQueue
+              - Arn
+        batchSize: 10
+    package:
+      include:
+        - calculate-weekly-mpf-price/**
+
+  calculateMonthlyAverageMPFPrice:
+    handler: calculate-monthly-mpf-price/index.handler
+    description: Calculate monthly average MPF price
+    memorySize: 128
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - mpfPriceMonthlyUpdateQueue
+              - Arn
+        batchSize: 10
+    package:
+      include:
+        - calculate-monthly-mpf-price/**
+
+  distributeForAverageMPFPriceCalculation:
+    handler: distribute-for-average-price-calculation/index.handler
+    description: Distribute for average price calculation
     memorySize: 128
     events:
       - stream: 
           arn: arn:aws:dynamodb:us-east-2:041740121314:table/MPFPriceDaily/stream/2019-04-17T15:42:02.033
-          batchSize: 20
+          batchSize: 30
           startingPosition: LATEST
     package:
       include:
-        - calculate-period-mpf-price/**
+        - distribute-for-average-price-calculation/**
+    environment:
+      MONTHLY_PRICE_QUEUE:
+        Ref: mpfPriceMonthlyUpdateQueue
+      WEEKLY_PRICE_QUEUE:
+        Ref: mpfPriceWeeklyUpdateQueue

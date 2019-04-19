@@ -1,0 +1,23 @@
+{
+  "name": "distribute-for-average-price-calculation",
+  "version": "0.0.1",
+  "description": "Function to distribute request for weekly and monthly average price calculation",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "gavinklfong",
+  "license": "ISC",
+  "bugs": {
+    "url": ""
+  },
+  "homepage": "",
+  "dependencies": {
+    "aws-sdk": "^2.432.0",
+    "moment": "^2.24.0",
+    "joi": "^14.3.1",
+    "lodash": "^4.17.11",
+    "uuid": "^3.3.2"
+  }
+}

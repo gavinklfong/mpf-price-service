@@ -1,0 +1,20 @@
+{
+  "name": "calculate-weekly-mpf-price",
+  "version": "0.0.1",
+  "description": "Function to calculate and save weekly MPF price to dynamodb",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "gavinklfong",
+  "license": "ISC",
+  "bugs": {
+    "url": ""
+  },
+  "homepage": "",
+  "dependencies": {
+    "aws-sdk": "^2.432.0",
+    "moment": "^2.24.0"
+  }
+}
