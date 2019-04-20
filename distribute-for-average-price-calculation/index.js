@@ -14,6 +14,8 @@ aws.config.update({region: 'us-east-2'});
 
 const sqs = new aws.SQS();
 
+const sns = new aws.SNS();
+
 const DEFAULT_DAILY_TABLE_NAME = "MPFPriceDaily";
 const DEFAULT_MONTHLY_TABLE_NAME = "MPFPriceMonthly";
 const DEFAULT_WEEKLY_TABLE_NAME = "MPFPriceWeekly";
@@ -38,8 +40,24 @@ exports.handler = async (event) => {
         try {
               if (eventRecord.eventSource == "aws:dynamodb") {
               
+                    // Skip the record if price is unchanged
+                    if (eventRecord.eventName == "MODIFY") {
+                        try {
+                            let oldPrice = +eventRecord.dynamodb.OldImage.price.S;
+                            let newPrice = +eventRecord.dynamodb.NewImage.price.S;
+                            if (oldPrice == newPrice) {
+                                continue;
+                            }
+                        } catch (e) {
+                            console.log('price attribute does not exist in "MODIFY" event');
+                        }
+                    }
+
                     let trusteeSchemeFundId = eventRecord.dynamodb.Keys.trusteeSchemeFundId.S;
                     let priceDate = +eventRecord.dynamodb.Keys.priceDate.N;
+
+                    // Send daily price record key to topic
+                    await sendToDailyPriceUpdateTopic({'trusteeSchemeFundId': trusteeSchemeFundId, 'priceDate': priceDate});
 
                     // Update weekly date key
                     weeklyDateMap = consolidateWeeklyDate(weeklyDateMap, trusteeSchemeFundId, priceDate);
@@ -50,9 +68,11 @@ exports.handler = async (event) => {
         
         } catch (e) {
             console.error(e);
+            throw e;
         }
     }
 
+    // Send to queue for weekly and monthly price update
     let weeklyRecords = await sendToWeeklyPriceRecordQueue(weeklyDateMap);
     let monthlyRecords = await sendToMonthlyPriceRecordQueue(monthlyDateMap);
 
@@ -62,6 +82,23 @@ exports.handler = async (event) => {
     };
     return response;
 };
+
+async function sendToDailyPriceUpdateTopic(priceRecordKey) {
+
+  let topicArn = process.env.DAILY_PRICE_TOPIC;
+
+  let params = {
+    Message: JSON.stringify(priceRecordKey), 
+    TopicArn: topicArn
+  };
+
+  try {
+    await sns.publish(params).promise();
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
+}
 
 
 async function sendQueueMessage(record, queueUrl) {
