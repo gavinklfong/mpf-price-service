@@ -25,7 +25,7 @@ exports.handler = async (event) => {
       let endDate = moment().subtract(1, 'weeks').startOf('day');
   
       try {
-        await retrieveMPFPrice(startDate, endDate);
+        await retrieveMPFPrice(startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD'));
       } catch (e) {
         console.error(e);
         throw e;
