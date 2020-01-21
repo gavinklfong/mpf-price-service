@@ -79,11 +79,15 @@ resources:
 provider:
   name: aws
   runtime: nodejs12.x
-  tracing:
-    lambda: true
-
   stage: dev
   region: us-east-2
+
+  logs:
+    restApi: true  
+
+  tracing:
+    lambda: true
+    apiGateway: true
 
   timeout: 300
 
