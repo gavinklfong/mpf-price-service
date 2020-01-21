@@ -78,7 +78,7 @@ resources:
 
 provider:
   name: aws
-  runtime: nodejs8.10
+  runtime: nodejs12.x
   tracing:
     lambda: true
 
@@ -87,6 +87,19 @@ provider:
 
   timeout: 300
 
+  apiKeys:
+    - name: apiKey1
+      value: Whalebig27Whalebig27
+      description: Sample API key
+  
+  usagePlan:
+    quota:
+      limit: 5000
+      offset: 2
+      period: MONTH
+    throttle:
+      burstLimit: 200
+      rateLimit: 100
 
 # the Lambda function's IAM Role
   iamRoleStatements:
@@ -210,6 +223,19 @@ functions:
   #     - schedule: 
   #         rate: cron(*/1 * * * ? *)
   #         enabled: true
+
+  getMPFPriceAPI:
+    handler: get-mpf-price-api/index.handler
+    description: Get MPF Price API
+    memorySize: 128
+    package:
+      include:
+        - get-mpf-price-api/**
+    events:
+      - http:
+          path: mpf-price
+          method: get
+          private: true
 
   retrieveMPFPrice:
     handler: retrieve-mpf-price/index.handler
