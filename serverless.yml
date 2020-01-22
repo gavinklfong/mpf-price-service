@@ -229,7 +229,7 @@ functions:
   #         enabled: true
 
   getMPFPriceAPI:
-    handler: get-mpf-price-api/index.handler
+    handler: get-mpf-price-api/index.fundPrice
     description: Get MPF Price API
     memorySize: 128
     package:
@@ -237,9 +237,15 @@ functions:
         - get-mpf-price-api/**
     events:
       - http:
-          path: mpf-price
+          path: mpf/{trustee}/schemes/{scheme}/funds/{fund}/price
           method: get
           private: true
+          request:
+            parameters:
+              paths:
+                trustee: true
+                scheme: true     
+                fund: true
 
   retrieveMPFPrice:
     handler: retrieve-mpf-price/index.handler

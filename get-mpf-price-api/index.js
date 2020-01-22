@@ -1,3 +1,5 @@
+'use strict';
+
 const moment = require('moment');
 const aws = require('aws-sdk');
 aws.config.update({region: 'us-east-2'});
@@ -5,15 +7,99 @@ aws.config.update({region: 'us-east-2'});
 const dynamodb = new aws.DynamoDB;
 const docClient = new aws.DynamoDB.DocumentClient();
 
+module.exports.trustee = async event => {
+  return {
+    statusCode: 200,
+    body: JSON.stringify(
+      {
+        message: 'Go Serverless v1.0! Your function executed successfully!',
+        input: event,
+      },
+      null,
+      2
+    ),
+  };
 
-module.exports.handler = async (event, context, callback) => {
+  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
+  // return { message: 'Go Serverless v1.0! Your function executed successfully!', event };
+};
 
-  let trusteeSchemeFundId = "HSBC-SuperTrust Plus-North American Equity Fund";
-  let endOfDateMoment = moment();
+module.exports.scheme = async event => {
+  return {
+    statusCode: 200,
+    body: JSON.stringify(
+      {
+        message: 'Go Serverless v1.0! Your function executed successfully!',
+        input: event,
+      },
+      null,
+      2
+    ),
+  };
+
+  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
+  // return { message: 'Go Serverless v1.0! Your function executed successfully!', event };
+};
+
+module.exports.fund = async event => {
+  return {
+    statusCode: 200,
+    body: JSON.stringify(
+      {
+        message: 'Go Serverless v1.0! Your function executed successfully!',
+        input: event,
+      },
+      null,
+      2
+    ),
+  };
+
+  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
+  // return { message: 'Go Serverless v1.0! Your function executed successfully!', event };
+};
+
+
+module.exports.fundPrice = async event => {
+
+// extract input parameters
+  let trustee = event.pathParameters.trustee;
+  let scheme = event.pathParameters.scheme;
+  let fund = event.pathParameters.fund;
+
+  let trusteeSchemeFundId = trustee + "-" + scheme + "-" + fund;
+  trusteeSchemeFundId = decodeURIComponent(trusteeSchemeFundId);
+
   let startOfDateMoment = moment().subtract(1, 'months');
-  let queryData = "'";
+  let startDate = startOfDateMoment.format("YYYYMMDD");
+  try {
 
-  console.log("## retrieve MPF dialy price "  + trusteeSchemeFundId + ", startOfDatePeriod = " + startOfDateMoment.format());
+    startDate = event.queryStringParameters.startDate;
+    console.info("input startDate = " + startDate);
+    if (startDate) {
+      startOfDateMoment = moment(startDate, "YYYYMMDD");
+    } 
+
+  } catch (e) {
+    console.info("startDate parameter not defined, use default value");
+  }
+
+  let endOfDateMoment = moment(startOfDateMoment).add(1, 'months');
+  let endDate = endOfDateMoment.format("YYYYMMDD");
+  try {  
+    endDate = event.queryStringParameters.endDate;
+    if (endDate) {
+      console.info("input endDate = " + endDate);
+      endOfDateMoment = moment(endDate, "YYYYMMDD");
+    } 
+  } catch (e) {
+    console.info("endDate parameter not defined, use default value");
+  }
+
+
+// Run query on DynamoDB
+ let queryData = "'";
+
+  console.log("## retrieve MPF dialy price "  + trusteeSchemeFundId + ", startOfDatePeriod = " + startOfDateMoment.format() + ", endOfDatePeriod = " + endOfDateMoment.format());
 
   let params = {
       TableName: "MPFPriceDaily",
@@ -45,19 +131,19 @@ module.exports.handler = async (event, context, callback) => {
     // console.log("mpfPriceRecord: " + JSON.stringify(mpfPriceRecord));
 
   } catch (e) {
-      console.error("Unable to query. Error:", JSON.stringify(err, null, 2));
+      console.error("Unable to query. Error:", JSON.stringify(e, null, 2));
+
+      return {
+        statusCode: 500,
+        body: JSON.stringify(e, null, 2)
+      };
   }
 
-  const response = {
+  return {
     statusCode: 200,
     body: JSON.stringify(queryData)
-    
-  //   JSON.stringify({
-  //     message: 'Go Serverless v1.0! Your function executed successfully!',
-  //     input: event,
-  //   }),
+
   };
 
-  callback(null, response);
 
 };
