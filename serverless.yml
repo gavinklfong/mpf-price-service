@@ -171,7 +171,7 @@ provider:
           - - arn:aws:dynamodb
             - Ref: AWS::Region
             - Ref: AWS::AccountId
-            - table/MPFPrice*
+            - table/MPF*
     - Effect: "Allow"
       Action:
           - "dynamodb:DescribeStream"
@@ -239,6 +239,7 @@ functions:
       - http:
           path: mpf/{trustee}/schemes/{scheme}/funds/{fund}/price
           method: get
+          cors: true
           private: true
           request:
             parameters:
@@ -246,6 +247,43 @@ functions:
                 trustee: true
                 scheme: true     
                 fund: true
+
+  getMPFTrusteeAPI:
+    handler: get-mpf-price-api/index.trustee
+    description: Get MPF Trustee API
+    memorySize: 128
+    package:
+      include:
+        - get-mpf-price-api/**
+    events:
+      - http:
+          path: mpf/{trustee}
+          method: get
+          cors: true
+          private: true
+          request:
+            parameters:
+              paths:
+                trustee: true
+
+  getMPFSchemeAPI:
+    handler: get-mpf-price-api/index.scheme
+    description: Get MPF Scheme API
+    memorySize: 128
+    package:
+      include:
+        - get-mpf-price-api/**
+    events:
+      - http:
+          path: mpf/{trustee}/schemes/{scheme}
+          method: get
+          cors: true
+          private: true
+          request:
+            parameters:
+              paths:
+                trustee: true
+                scheme: true     
 
   retrieveMPFPrice:
     handler: retrieve-mpf-price/index.handler

@@ -8,42 +8,101 @@ const dynamodb = new aws.DynamoDB;
 const docClient = new aws.DynamoDB.DocumentClient();
 
 module.exports.trustee = async event => {
-  return {
-    statusCode: 200,
-    body: JSON.stringify(
-      {
-        message: 'Go Serverless v1.0! Your function executed successfully!',
-        input: event,
-      },
-      null,
-      2
-    ),
+
+  let queryData = null;
+  let trustee = event.pathParameters.trustee;
+  trustee = decodeURIComponent(trustee);
+
+  let params = {
+    TableName: "MPFTrustee",
+    // IndexName: "trustee_date_index",
+    // KeyConditionExpression: "trustee = :id",
+    FilterExpression: "trustee = :trustee",
+    ExpressionAttributeValues: {
+        ":trustee": trustee,
+        },
+    // ExpressionAttributeNames: {
+    //   "#trustee": "trustee"
+    // },
+    ProjectionExpression: "trustee, scheme, fund"
   };
 
-  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
-  // return { message: 'Go Serverless v1.0! Your function executed successfully!', event };
+  try {
+    queryData = await docClient.scan(params).promise();
+    console.log("Query succeeded.");
+
+  } catch (e) {
+      console.error("Unable to query. Error:", JSON.stringify(e, null, 2));
+
+      return {
+        statusCode: 500,
+        body: JSON.stringify(e)
+      };
+  }
+
+  return {
+    statusCode: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+    },
+    body: JSON.stringify(queryData)
+
+  };
 };
 
 module.exports.scheme = async event => {
-  return {
-    statusCode: 200,
-    body: JSON.stringify(
-      {
-        message: 'Go Serverless v1.0! Your function executed successfully!',
-        input: event,
-      },
-      null,
-      2
-    ),
+  
+  let queryData = null;
+  let trustee = event.pathParameters.trustee;
+  trustee = decodeURIComponent(trustee);
+
+  let scheme = event.pathParameters.scheme;
+  scheme = decodeURIComponent(scheme);
+
+  let params = {
+    TableName: "MPFTrustee",
+    // IndexName: "trustee_date_index",
+    // KeyConditionExpression: "trustee = :id and scheme = :scheme",
+    FilterExpression: "trustee = :trustee and scheme = :scheme",
+    ExpressionAttributeValues: {
+        ":trustee": trustee,
+        ":scheme": scheme
+        },
+    ProjectionExpression: "trustee, scheme, fund"
   };
 
-  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
-  // return { message: 'Go Serverless v1.0! Your function executed successfully!', event };
+  try {
+    queryData = await docClient.scan(params).promise();
+    console.log("Query succeeded.");
+
+  } catch (e) {
+      console.error("Unable to query. Error:", JSON.stringify(e, null, 2));
+
+      return {
+        statusCode: 500,
+        body: JSON.stringify(e, null, 2)
+      };
+  }
+
+  return {
+    statusCode: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+    },
+    body: JSON.stringify(queryData)
+
+  };
 };
 
 module.exports.fund = async event => {
   return {
     statusCode: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+    },
     body: JSON.stringify(
       {
         message: 'Go Serverless v1.0! Your function executed successfully!',
@@ -167,6 +226,10 @@ module.exports.fundPrice = async event => {
   
     return {
       statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true,
+      },
       body: JSON.stringify(queryData)
   
     };

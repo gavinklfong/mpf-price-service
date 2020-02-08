@@ -1,0 +1,125 @@
+{
+  "resource": "/mpf",
+  "path": "/mpf",
+  "httpMethod": "GET",
+  "headers": {
+      "Accept": "*/*",
+      "Accept-Encoding": "gzip, deflate",
+      "Cache-Control": "no-cache",
+      "CloudFront-Forwarded-Proto": "https",
+      "CloudFront-Is-Desktop-Viewer": "true",
+      "CloudFront-Is-Mobile-Viewer": "false",
+      "CloudFront-Is-SmartTV-Viewer": "false",
+      "CloudFront-Is-Tablet-Viewer": "false",
+      "CloudFront-Viewer-Country": "HK",
+      "Host": "114teod1fc.execute-api.us-east-2.amazonaws.com",
+      "Postman-Token": "638256f9-7957-4212-878a-6c857702988b",
+      "User-Agent": "PostmanRuntime/7.21.0",
+      "Via": "1.1 933f4fb3c49c9a37f5b5461deacd212c.cloudfront.net (CloudFront)",
+      "X-Amz-Cf-Id": "cDNoucn05bRKLas1VjDk1sKEz6eA0bigkTUvYyXMLFzD2zhgzDtbrw==",
+      "X-Amzn-Trace-Id": "Root=1-5e272142-88766e56cc3f4f514c8c504c",
+      "x-api-key": "Whalebig27Whalebig27",
+      "X-Forwarded-For": "113.254.66.64, 130.176.25.77",
+      "X-Forwarded-Port": "443",
+      "X-Forwarded-Proto": "https"
+  },
+  "multiValueHeaders": {
+      "Accept": [
+          "*/*"
+      ],
+      "Accept-Encoding": [
+          "gzip, deflate"
+      ],
+      "Cache-Control": [
+          "no-cache"
+      ],
+      "CloudFront-Forwarded-Proto": [
+          "https"
+      ],
+      "CloudFront-Is-Desktop-Viewer": [
+          "true"
+      ],
+      "CloudFront-Is-Mobile-Viewer": [
+          "false"
+      ],
+      "CloudFront-Is-SmartTV-Viewer": [
+          "false"
+      ],
+      "CloudFront-Is-Tablet-Viewer": [
+          "false"
+      ],
+      "CloudFront-Viewer-Country": [
+          "HK"
+      ],
+      "Host": [
+          "114teod1fc.execute-api.us-east-2.amazonaws.com"
+      ],
+      "Postman-Token": [
+          "638256f9-7957-4212-878a-6c857702988b"
+      ],
+      "User-Agent": [
+          "PostmanRuntime/7.21.0"
+      ],
+      "Via": [
+          "1.1 933f4fb3c49c9a37f5b5461deacd212c.cloudfront.net (CloudFront)"
+      ],
+      "X-Amz-Cf-Id": [
+          "cDNoucn05bRKLas1VjDk1sKEz6eA0bigkTUvYyXMLFzD2zhgzDtbrw=="
+      ],
+      "X-Amzn-Trace-Id": [
+          "Root=1-5e272142-88766e56cc3f4f514c8c504c"
+      ],
+      "x-api-key": [
+          "Whalebig27Whalebig27"
+      ],
+      "X-Forwarded-For": [
+          "113.254.66.64, 130.176.25.77"
+      ],
+      "X-Forwarded-Port": [
+          "443"
+      ],
+      "X-Forwarded-Proto": [
+          "https"
+      ]
+  },
+  "queryStringParameters": null,
+  "multiValueQueryStringParameters": null,
+  "pathParameters": {
+      "trustee" : "HSBC"
+  },
+  "stageVariables": null,
+  "requestContext": {
+      "resourceId": "68q9um",
+      "resourcePath": "/mpf",
+      "httpMethod": "GET",
+      "extendedRequestId": "GqIicHZxiYcFZ9g=",
+      "requestTime": "21/Jan/2020:16:05:22 +0000",
+      "path": "/dev/mpf",
+      "accountId": "041740121314",
+      "protocol": "HTTP/1.1",
+      "stage": "dev",
+      "domainPrefix": "114teod1fc",
+      "requestTimeEpoch": 1579622722768,
+      "requestId": "f56cc7a0-f0f7-41e3-841f-3ca815d4473f",
+      "identity": {
+          "cognitoIdentityPoolId": null,
+          "cognitoIdentityId": null,
+          "apiKey": "Whalebig27Whalebig27",
+          "principalOrgId": null,
+          "cognitoAuthenticationType": null,
+          "userArn": null,
+          "apiKeyId": "8at4hinpu8",
+          "userAgent": "PostmanRuntime/7.21.0",
+          "accountId": null,
+          "caller": null,
+          "sourceIp": "113.254.66.64",
+          "accessKey": null,
+          "cognitoAuthenticationProvider": null,
+          "user": null
+      },
+      "domainName": "114teod1fc.execute-api.us-east-2.amazonaws.com",
+      "apiId": "114teod1fc"
+  },
+  "body": null,
+  "isBase64Encoded": false
+}
