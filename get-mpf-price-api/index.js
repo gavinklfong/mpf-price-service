@@ -180,6 +180,7 @@ module.exports.fundPrice = async event => {
   
   // Run query on DynamoDB
    let queryData = "'";
+   let transformedData = "";
   
     console.log("## retrieve MPF dialy price "  + trusteeSchemeFundId 
     + ", startOfDatePeriod = " + startOfDateMoment.format() 
@@ -203,6 +204,20 @@ module.exports.fundPrice = async event => {
     try {
       queryData = await docClient.query(params).promise();
       console.log("Query succeeded.");
+
+      transformedData = queryData.Items.map(item => {
+        let dateMoment = moment(item.priceDate);
+        
+        return {
+          trusteeSchemeFundId: item.trusteeSchemeFundId,
+          trustee: item.trustee,
+          scheme: item.scheme,
+          fundName: item.fundName,
+          priceDate: dateMoment.format("YYYYMMDD"),
+          price: item.price
+        };
+      });
+
       // queryData.Items.forEach(function(item) {
       //     // console.log(JSON.stringify(item));
       //     sum = sum + +item.price;
@@ -230,7 +245,7 @@ module.exports.fundPrice = async event => {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': true,
       },
-      body: JSON.stringify(queryData)
+      body: JSON.stringify(transformedData)
   
     };
 

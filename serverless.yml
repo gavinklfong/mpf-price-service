@@ -275,7 +275,7 @@ functions:
         - get-mpf-price-api/**
     events:
       - http:
-          path: mpf/{trustee}/schemes/{scheme}
+          path: mpf/{trustee}/schemes/{scheme}/funds
           method: get
           cors: true
           private: true
