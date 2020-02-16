@@ -1,0 +1,17 @@
+{
+  "name": "retrieve-mpf-price-bct",
+  "version": "1.0.0",
+  "description": "Retrieve MPF price and feed to SQS (for trustee BCT)",
+  "main": "index.js",
+  "dependencies": {
+    "aws-sdk": "^2.437.0",
+    "axios": "^0.18.0",
+    "joi": "^14.3.1",
+    "lodash": "^4.17.11",
+    "moment": "^2.24.0",
+    "stream-array": "^1.1.2",
+    "uuid": "^3.3.2"
+  },
+  "author": "",
+  "license": "ISC"
+}

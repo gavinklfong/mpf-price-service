@@ -63,11 +63,16 @@ resources:
         Name: saveMPFPriceDynamodbArn
       Value:
          Fn::GetAtt: SaveMPFPriceDynamodbLambdaFunction.Arn
-    retrieveMPFPriceArn:
+    retrieveMPFPriceHSBCArn:
       Export:
-        Name: retrieveMPFPriceArn
+        Name: retrieveMPFPriceHSBCArn
       Value:
-         Fn::GetAtt: RetrieveMPFPriceLambdaFunction.Arn
+         Fn::GetAtt: RetrieveMPFPriceHSBCLambdaFunction.Arn
+    retrieveMPFPriceBCTArn:
+      Export:
+        Name: retrieveMPFPriceBCTArn
+      Value:
+         Fn::GetAtt: RetrieveMPFPriceBCTLambdaFunction.Arn         
     mpfPriceQueue:
       Export:
         Name: mpfPriceQueueName
@@ -285,13 +290,30 @@ functions:
                 trustee: true
                 scheme: true     
 
-  retrieveMPFPrice:
-    handler: retrieve-mpf-price/index.handler
-    description: Retrieve MPF price from API and feed to SQS
+  retrieveMPFPriceHSBC:
+    handler: retrieve-mpf-price-hsbc/index.handler
+    description: Retrieve MPF price from API and feed to SQS (for trustee HSBC)
     memorySize: 128
     package:
       include:
-        - retrieve-mpf-price/**
+        - retrieve-mpf-price-hsbc/**
+    events:
+      - schedule: 
+          rate: cron(0 18 */7 * ? *)
+          enabled: true
+    environment:
+      SQS_QUEUE_NAME:
+        Fn::GetAtt:
+          - mpfPriceQueue
+          - QueueName
+
+  retrieveMPFPriceBCT:
+    handler: retrieve-mpf-price-bct/index.handler
+    description: Retrieve MPF price from API and feed to SQS (for trustee BCT)
+    memorySize: 128
+    package:
+      include:
+        - retrieve-mpf-price-bct/**
     events:
       - schedule: 
           rate: cron(0 18 */7 * ? *)

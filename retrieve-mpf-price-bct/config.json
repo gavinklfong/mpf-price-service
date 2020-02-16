@@ -1,0 +1,8 @@
+{
+      "url": "https://www.bcthk.com/en/mpf-orso/fund-information/fund-prices",
+      "method": "POST",
+      "body": "option=com_ajax&module=bct_fundprice&format=json&method=requestFundPrice&data%5Bcategory_id%5D=%s&data%5Bdate%5D=%s",
+      "headers": {
+            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+      }
+}

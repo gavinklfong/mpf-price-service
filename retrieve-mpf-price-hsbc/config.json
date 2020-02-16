@@ -1,0 +1,20 @@
+{
+      "url": "https://rbwm-api.hsbc.com.hk/digital-pws-tools-mpf-eapi-prod-proxy/v1/mpf/unit-prices/download/HSBCTRUSTPLUS?fund=%s&startDate=%s&endDate=%s&locale=en_HK",
+      "funds": [
+            "APF",
+            "ANEF",
+            "BLF",
+            "CNEF",
+            "CAF",
+            "EUEF",
+            "GBA",
+            "GRF",
+            "GTF",
+            "HSIF",
+            "HKEF",
+            "CPF",
+            "NAEF",
+            "SBF"
+
+      ]
+}
