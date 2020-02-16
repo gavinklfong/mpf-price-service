@@ -4,6 +4,7 @@
   "description": "Get MPF price API",
   "main": "index.js",
   "dependencies": {
+    "aws-sdk": "^2.619.0",
     "moment": "^2.24.0"
   },
   "author": "",

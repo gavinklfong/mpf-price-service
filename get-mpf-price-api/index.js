@@ -4,35 +4,19 @@ const moment = require('moment');
 const aws = require('aws-sdk');
 aws.config.update({region: 'us-east-2'});
 
-const dynamodb = new aws.DynamoDB;
 const docClient = new aws.DynamoDB.DocumentClient();
 
-module.exports.trustee = async event => {
+const MPF_CATALOG_TABLE = "MPFCatalog";
+
+module.exports.trusteeList = async event => {
 
   let queryData = null;
-  let trustee = event.pathParameters.trustee;
-  trustee = decodeURIComponent(trustee);
-
-  let params = {
-    TableName: "MPFTrustee",
-    // IndexName: "trustee_date_index",
-    // KeyConditionExpression: "trustee = :id",
-    FilterExpression: "trustee = :trustee",
-    ExpressionAttributeValues: {
-        ":trustee": trustee,
-        },
-    // ExpressionAttributeNames: {
-    //   "#trustee": "trustee"
-    // },
-    ProjectionExpression: "trustee, scheme, fund"
-  };
 
   try {
-    queryData = await docClient.scan(params).promise();
-    console.log("Query succeeded.");
+     queryData = await getTrusteeList();
 
   } catch (e) {
-      console.error("Unable to query. Error:", JSON.stringify(e, null, 2));
+      console.error("Unable to retrieve trustee information. Error:", JSON.stringify(e));
 
       return {
         statusCode: 500,
@@ -40,83 +24,61 @@ module.exports.trustee = async event => {
       };
   }
 
-  return {
-    statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Credentials': true,
-    },
-    body: JSON.stringify(queryData)
+  return prepareResponse(200, queryData);
 
-  };
 };
+
+
+module.exports.trustee = async event => {
+
+  let trustee = event.pathParameters.trustee;
+  trustee = decodeURIComponent(trustee);
+  console.log("received parameter: " + trustee);
+
+  let queryData = null;
+
+  try {
+     queryData = await getMPFCatalog(trustee);
+
+  } catch (e) {
+      console.error("Unable to retrieve trustee information. Error:", JSON.stringify(e));
+
+      return {
+        statusCode: 500,
+        body: JSON.stringify(e)
+      };
+  }
+
+  return prepareResponse(200, queryData);
+
+};
+
 
 module.exports.scheme = async event => {
   
-  let queryData = null;
   let trustee = event.pathParameters.trustee;
   trustee = decodeURIComponent(trustee);
 
   let scheme = event.pathParameters.scheme;
   scheme = decodeURIComponent(scheme);
 
-  let params = {
-    TableName: "MPFTrustee",
-    // IndexName: "trustee_date_index",
-    // KeyConditionExpression: "trustee = :id and scheme = :scheme",
-    FilterExpression: "trustee = :trustee and scheme = :scheme",
-    ExpressionAttributeValues: {
-        ":trustee": trustee,
-        ":scheme": scheme
-        },
-    ProjectionExpression: "trustee, scheme, fund"
-  };
+
+  let queryData = null;
 
   try {
-    queryData = await docClient.scan(params).promise();
-    console.log("Query succeeded.");
+     queryData = await getMPFCatalog(trustee, scheme);
 
   } catch (e) {
-      console.error("Unable to query. Error:", JSON.stringify(e, null, 2));
+      console.error("Unable to retrieve trustee information. Error:", JSON.stringify(e));
 
       return {
         statusCode: 500,
-        body: JSON.stringify(e, null, 2)
+        body: JSON.stringify(e)
       };
   }
 
-  return {
-    statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Credentials': true,
-    },
-    body: JSON.stringify(queryData)
-
-  };
+  return prepareResponse(200, queryData);
 };
-
-module.exports.fund = async event => {
-  return {
-    statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Credentials': true,
-    },
-    body: JSON.stringify(
-      {
-        message: 'Go Serverless v1.0! Your function executed successfully!',
-        input: event,
-      },
-      null,
-      2
-    ),
-  };
-
-  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
-  // return { message: 'Go Serverless v1.0! Your function executed successfully!', event };
-};
-
 
 module.exports.fundPrice = async event => {
 
@@ -239,14 +201,95 @@ module.exports.fundPrice = async event => {
         };
     }
   
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': true,
-      },
-      body: JSON.stringify(transformedData)
-  
-    };
+    return prepareResponse(200, transformedData);
 
 };
+
+function prepareResponse(statusCode, body) {
+
+  return {
+    statusCode: statusCode,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+      'Content-Type': "application/json"
+    },
+    body: JSON.stringify(body)
+
+  };
+}
+
+async function getTrusteeList() {
+
+  let params = {
+    TableName: MPF_CATALOG_TABLE,
+    ProjectionExpression: "trustee"
+  };
+
+  let queryItemList = [];
+
+  try {
+      let queryData = await docClient.scan(params).promise();
+      queryItemList = queryData.Items;
+      
+      let map = new Map();
+      let distinctItemList = [];
+      queryItemList.forEach(item => {
+        if (!map.has(item.trustee)) {
+          map.set(item.trustee, true);
+          distinctItemList.push(item.trustee);
+        }
+      });
+
+      queryItemList = distinctItemList;
+
+  } catch (e) {
+      console.error("Unable to query. Error:", JSON.stringify(e));
+      console.error(e);
+  }
+
+  return queryItemList;
+
+}
+
+async function getMPFCatalog(trustee, scheme) {
+   
+  console.log("parameters: trustee=" + trustee + ", scheme=" + scheme);
+  let params = null;
+
+  if (!scheme) {
+     params = {
+      TableName: MPF_CATALOG_TABLE,
+      KeyConditionExpression: "trustee = :id",
+      ExpressionAttributeValues: {
+          ":id": trustee,
+         },
+      ProjectionExpression: "trustee, scheme, fund"
+    };
+
+  } else {
+     params = {
+      TableName: MPF_CATALOG_TABLE,
+      KeyConditionExpression: "trustee = :id",
+      ExpressionAttributeValues: {
+          ":id": trustee,
+          ":scheme": scheme
+         },
+      FilterExpression: "scheme = :scheme",
+      ProjectionExpression: "trustee, scheme, fund"
+    };
+  }
+
+  let queryItemList = [];
+
+  try {
+      let queryData = await docClient.query(params).promise();
+      queryItemList = queryData.Items;
+
+  } catch (e) {
+      console.error("Unable to query. Error:", JSON.stringify(e));
+      console.error(e);
+  }
+
+  return queryItemList;
+}

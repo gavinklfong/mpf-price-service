@@ -253,6 +253,24 @@ functions:
                 scheme: true     
                 fund: true
 
+  getMPFTrusteeListAPI:
+    handler: get-mpf-price-api/index.trusteeList
+    description: Get MPF Trustee List API
+    memorySize: 128
+    package:
+      include:
+        - get-mpf-price-api/**
+    events:
+      - http:
+          path: mpf
+          method: get
+          cors: true
+          private: true
+          request:
+            parameters:
+              paths:
+                trustee: true
+
   getMPFTrusteeAPI:
     handler: get-mpf-price-api/index.trustee
     description: Get MPF Trustee API
@@ -280,7 +298,7 @@ functions:
         - get-mpf-price-api/**
     events:
       - http:
-          path: mpf/{trustee}/schemes/{scheme}/funds
+          path: mpf/{trustee}/schemes/{scheme}
           method: get
           cors: true
           private: true
