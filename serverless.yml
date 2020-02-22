@@ -242,16 +242,10 @@ functions:
         - get-mpf-price-api/**
     events:
       - http:
-          path: mpf/{trustee}/schemes/{scheme}/funds/{fund}/price
-          method: get
+          path: mpf/price
+          method: post
           cors: true
-          private: true
-          request:
-            parameters:
-              paths:
-                trustee: true
-                scheme: true     
-                fund: true
+          private: true  
 
   getMPFTrusteeListAPI:
     handler: get-mpf-price-api/index.trusteeList

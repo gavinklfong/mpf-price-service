@@ -83,22 +83,46 @@
       ]
   },
   "queryStringParameters": {
-      "endDate": "20200122",
-      "scheme": "HSBC",
-      "startDate": "20200101"
+      "endDate": "20200201",
+      "scheme": "SuperTrust Plus",
+      "trustee": "HSBC",
+      "startDate": "20191101",
+      "fund": "Hang Seng Index Tracking Fund"
   },
   "multiValueQueryStringParameters": {
       "endDate": [
-          "20200122"
+        "20200201"
       ],
-      "scheme": [
+      "trustee": [
           "HSBC"
       ],
+      "scheme": [
+        "SuperTrust Plus"
+    ],
       "startDate": [
-          "20200101"
-      ]
+          "20191101"
+      ],
+    "fund": [
+        "Hang Seng Index Tracking Fund"
+    ]
   },
-  "pathParameters": null,
+  "pathParameters": {
+    "endDate": [
+        "20200201"
+    ],
+    "trustee": [
+        "HSBC"
+    ],
+    "scheme": [
+      "SuperTrust Plus"
+  ],
+    "startDate": [
+        "20191101"
+    ],
+    "fund": [
+        "Hang Seng Index Tracking Fund"
+    ]
+},
   "stageVariables": null,
   "requestContext": {
       "resourceId": "68q9um",

@@ -1,0 +1,130 @@
+{
+    "resource": "/mpf/{trustee}/schemes/{scheme}/funds/price",
+    "path": "/mpf/HSBC/schemes/SuperTrust%20Plus/funds/price",
+    "httpMethod": "POST",
+    "headers": {
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Cache-Control": "no-cache",
+        "CloudFront-Forwarded-Proto": "https",
+        "CloudFront-Is-Desktop-Viewer": "true",
+        "CloudFront-Is-Mobile-Viewer": "false",
+        "CloudFront-Is-SmartTV-Viewer": "false",
+        "CloudFront-Is-Tablet-Viewer": "false",
+        "CloudFront-Viewer-Country": "HK",
+        "Content-Type": "text/plain",
+        "Host": "aifobzeuf2.execute-api.us-east-2.amazonaws.com",
+        "Postman-Token": "6f9bc4e2-c561-4150-abfa-7ff286fde569",
+        "User-Agent": "PostmanRuntime/7.22.0",
+        "Via": "1.1 7aa4887d07675cb624d6fe390d93be85.cloudfront.net (CloudFront)",
+        "X-Amz-Cf-Id": "BN9S1Vf1DIxxyLkBe9-qvqlIkGQHHiSPLKDRk33WeywnFA7wrr42fQ==",
+        "X-Amzn-Trace-Id": "Root=1-5e5144f6-26b7e2604dc501d89c4bb908",
+        "x-api-key": "Whalebig27Whalebig27",
+        "X-Forwarded-For": "113.254.66.64, 130.176.25.132",
+        "X-Forwarded-Port": "443",
+        "X-Forwarded-Proto": "https"
+    },
+    "multiValueHeaders": {
+        "Accept": [
+            "*/*"
+        ],
+        "Accept-Encoding": [
+            "gzip, deflate, br"
+        ],
+        "Cache-Control": [
+            "no-cache"
+        ],
+        "CloudFront-Forwarded-Proto": [
+            "https"
+        ],
+        "CloudFront-Is-Desktop-Viewer": [
+            "true"
+        ],
+        "CloudFront-Is-Mobile-Viewer": [
+            "false"
+        ],
+        "CloudFront-Is-SmartTV-Viewer": [
+            "false"
+        ],
+        "CloudFront-Is-Tablet-Viewer": [
+            "false"
+        ],
+        "CloudFront-Viewer-Country": [
+            "HK"
+        ],
+        "Content-Type": [
+            "text/plain"
+        ],
+        "Host": [
+            "aifobzeuf2.execute-api.us-east-2.amazonaws.com"
+        ],
+        "Postman-Token": [
+            "6f9bc4e2-c561-4150-abfa-7ff286fde569"
+        ],
+        "User-Agent": [
+            "PostmanRuntime/7.22.0"
+        ],
+        "Via": [
+            "1.1 7aa4887d07675cb624d6fe390d93be85.cloudfront.net (CloudFront)"
+        ],
+        "X-Amz-Cf-Id": [
+            "BN9S1Vf1DIxxyLkBe9-qvqlIkGQHHiSPLKDRk33WeywnFA7wrr42fQ=="
+        ],
+        "X-Amzn-Trace-Id": [
+            "Root=1-5e5144f6-26b7e2604dc501d89c4bb908"
+        ],
+        "x-api-key": [
+            "Whalebig27Whalebig27"
+        ],
+        "X-Forwarded-For": [
+            "113.254.66.64, 130.176.25.132"
+        ],
+        "X-Forwarded-Port": [
+            "443"
+        ],
+        "X-Forwarded-Proto": [
+            "https"
+        ]
+    },
+    "queryStringParameters": null,
+    "multiValueQueryStringParameters": null,
+    "pathParameters": {
+        "scheme": "SuperTrust%20Plus",
+        "trustee": "HSBC"
+    },
+    "stageVariables": null,
+    "requestContext": {
+        "resourceId": "m9aeyx",
+        "resourcePath": "/mpf/{trustee}/schemes/{scheme}/funds/price",
+        "httpMethod": "POST",
+        "extendedRequestId": "ITe2eFP-iYcF0gQ=",
+        "requestTime": "22/Feb/2020:15:12:54 +0000",
+        "path": "/dev/mpf/HSBC/schemes/SuperTrust%20Plus/funds/price",
+        "accountId": "041740121314",
+        "protocol": "HTTP/1.1",
+        "stage": "dev",
+        "domainPrefix": "aifobzeuf2",
+        "requestTimeEpoch": 1582384374170,
+        "requestId": "a0518c71-5764-46f4-a7da-4a64d793b588",
+        "identity": {
+            "cognitoIdentityPoolId": null,
+            "cognitoIdentityId": null,
+            "apiKey": "Whalebig27Whalebig27",
+            "principalOrgId": null,
+            "cognitoAuthenticationType": null,
+            "userArn": null,
+            "apiKeyId": "ct0a9hb7c0",
+            "userAgent": "PostmanRuntime/7.22.0",
+            "accountId": null,
+            "caller": null,
+            "sourceIp": "113.254.66.64",
+            "accessKey": null,
+            "cognitoAuthenticationProvider": null,
+            "user": null
+        },
+        "domainName": "aifobzeuf2.execute-api.us-east-2.amazonaws.com",
+        "apiId": "aifobzeuf2"
+    },
+    "body": "{\"startDate\":\"20191101\",\"endDate\":\"20200201\",\"timePeriod\":\"M\",\"funds\":[{\"trustee\":\"HSBC\",\"scheme\":\"SuperTrust Plus\",\"fund\":\"North American Equity Fund\"},{\"trustee\":\"HSBC\",\"scheme\":\"SuperTrust Plus\",\"fund\":\"Hang Seng Index Tracking Fund\"}]}",
+    "isBase64Encoded": false
+}
