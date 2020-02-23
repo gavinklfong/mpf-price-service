@@ -245,7 +245,7 @@ functions:
           path: mpf/price
           method: post
           cors: true
-          private: true  
+          # private: true  
 
   getMPFTrusteeListAPI:
     handler: get-mpf-price-api/index.trusteeList

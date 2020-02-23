@@ -88,9 +88,12 @@ module.exports.fundPrice = async event => {
     }
   }
 
-  console.log(event.body);
-
   let reqBody = JSON.parse(event.body);
+  console.log(reqBody);
+
+  console.log(reqBody.data)
+  reqBody = reqBody.data;
+
   let startDate = reqBody.startDate;
   let endDate = reqBody.endDate;
   let timePeriod = reqBody.timePeriod;
