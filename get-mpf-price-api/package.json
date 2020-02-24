@@ -3,11 +3,21 @@
   "version": "1.0.0",
   "description": "Get MPF price API",
   "main": "index.js",
+  "scripts": {
+    "test": "jest --watch"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "coverageReporters": ["html"]
+  },
   "dependencies": {
     "aws-sdk": "^2.619.0",
     "moment": "^2.24.0",
     "rxjs": "^6.5.4"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^25.1.0"
+  }
 }

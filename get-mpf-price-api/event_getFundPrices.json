@@ -125,6 +125,6 @@
         "domainName": "aifobzeuf2.execute-api.us-east-2.amazonaws.com",
         "apiId": "aifobzeuf2"
     },
-    "body": "{\"startDate\":\"20191101\",\"endDate\":\"20200201\",\"timePeriod\":\"M\",\"funds\":[{\"trustee\":\"HSBC\",\"scheme\":\"SuperTrust Plus\",\"fund\":\"North American Equity Fund\"},{\"trustee\":\"HSBC\",\"scheme\":\"SuperTrust Plus\",\"fund\":\"Hang Seng Index Tracking Fund\"}]}",
+    "body": "{\"headers\":{\"x-api-key\":\"Whalebig27Whalebig27\"},\"params\":{\"startDate\":20200125,\"endDate\":20200225,\"timePeriod\":\"D\"},\"data\":{\"startDate\":20200125,\"endDate\":20200225,\"timePeriod\":\"D\",\"funds\":[{\"trustee\":\"HSBC\",\"scheme\":\"SuperTrust Plus\",\"fund\":\"Age 65 Plus Fund\"}]}}",
     "isBase64Encoded": false
 }

@@ -46,7 +46,7 @@ const formatFundPrices = (items) => {
       } 
       prices.push({priceDate: item.priceDate, price: item.price});
       priceMap.set(item.trusteeSchemeFundId, prices);
-      fundMap.set(item.trusteeSchemeFundId, {trustee: item.trustee, scheme: item.scheme, fund: item.fundName});
+      fundMap.set(item.trusteeSchemeFundId, {trustee: item.trustee, scheme: item.scheme, fund: item.fund});
   }
 
   let output = [];
@@ -164,12 +164,11 @@ const retrieveFundPrice = async (trustee, scheme, fund, startDate, endDate, time
         trusteeSchemeFundId: item.trusteeSchemeFundId,
         trustee: item.trustee,
         scheme: item.scheme,
-        fundName: item.fundName,
+        fund: item.fundName,
         priceDate: dateMoment.format("YYYYMMDD"),
         price: item.price
       };
     });
-
 
     return transformedData;
     
