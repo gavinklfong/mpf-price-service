@@ -1,0 +1,16 @@
+{
+  "name": "api-authorizer",
+  "version": "0.0.1",
+  "description": "API Authorizer",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "gavinklfong",
+  "homepage": "",
+  "dependencies": {
+    "aws-sdk": "^2.432.0",
+    "firebase-admin": "^8.10.0"
+  }
+}

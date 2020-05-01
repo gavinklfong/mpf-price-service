@@ -1,4 +1,5 @@
 const moment = require('moment');
+const dataAccess = require('./mpf-data-access');
 const aws = require('aws-sdk');
 aws.config.update({region: 'us-east-2'});
 
@@ -25,7 +26,8 @@ exports.handler = async (event) => {
                     const message = JSON.parse(eventRecord.body);
                     console.log("Message: " + JSON.stringify(message)); 
                     let averagePriceRecord = await calculateWeeklyAveragePrice(message.trusteeSchemeFundId, message.priceDate);
-                    await saveFundPrice(averagePriceRecord, DEFAULT_WEEKLY_TABLE_NAME);
+                    let priceRecordWithPerformance = await calculateAllPerformance(averagePriceRecord);
+                    await saveFundPrice(priceRecordWithPerformance, DEFAULT_WEEKLY_TABLE_NAME);
               } else {
                   throw new Error('Unknown event: ' + eventRecord.eventSource);
               }
@@ -49,21 +51,7 @@ async function calculateWeeklyAveragePrice(trusteeSchemeFundId, startOfDate) {
    let startOfDateMoment = moment(startOfDate).startOf('week');
    let endOfDateMoment = moment(startOfDateMoment).endOf('week');
     
-    console.log("## calculate weekly average price for id = "  + trusteeSchemeFundId + ", startOfDatePeriod = " + startOfDateMoment.format());
-
-    let params = {
-        TableName: "MPFPriceDaily",
-        // IndexName: "trustee_date_index",
-        KeyConditionExpression: "trusteeSchemeFundId = :id and priceDate between :startDate and :endDate",
-        // FilterExpression: "fundName = :fundName",
-        ExpressionAttributeValues: {
-            ":id": trusteeSchemeFundId,
-            ":startDate": startOfDateMoment.valueOf(),
-            ":endDate": endOfDateMoment.valueOf(),
-                // ":fundName": "HSI"
-            },
-        ProjectionExpression: "trusteeSchemeFundId, trustee, scheme, fundName, priceDate, dateDisplay, price"
-    };
+    console.log("calculateWeeklyAveragePrice() - calculate weekly average price for id = "  + trusteeSchemeFundId + ", startOfDatePeriod = " + startOfDateMoment.format());
 
     let mpfPriceRecord = {};
     let sum = 0;
@@ -71,58 +59,94 @@ async function calculateWeeklyAveragePrice(trusteeSchemeFundId, startOfDate) {
     let averagePrice = 0;
 
     try {
-        const queryData = await docClient.query(params).promise();
-        console.log("Query succeeded.");
-        queryData.Items.forEach(function(item) {
-            // console.log(JSON.stringify(item));
+        const retrievedPrices = await dataAccess.retrieveFundPriceByDate("D", trusteeSchemeFundId, startOfDateMoment.valueOf(),  endOfDateMoment.valueOf());        
+        retrievedPrices.forEach(function(item) {
             sum = sum + +item.price;
             count++;
         });
 
         if (count > 0) averagePrice = sum / count;
-        console.log("average price = " + averagePrice + ", count = " + count + ", sum = " + sum);
-        mpfPriceRecord = {"trusteeSchemeFundId": trusteeSchemeFundId, "trustee": queryData.Items[0].trustee, "scheme": queryData.Items[0].scheme, "fundName": queryData.Items[0].fundName, "priceDate": startOfDateMoment.valueOf(), "priceDateDisplay": startOfDateMoment.format("YYYY-MM-DD"), "price": averagePrice};
+        console.log("calculateWeeklyAveragePrice() - average price = " + averagePrice + ", count = " + count + ", sum = " + sum);
+        mpfPriceRecord = {"trusteeSchemeFundId": trusteeSchemeFundId, "trustee": retrievedPrices[0].trustee, "scheme": retrievedPrices[0].scheme, "fundName": retrievedPrices[0].fundName, "priceDate": startOfDateMoment.valueOf(), "priceDateDisplay": startOfDateMoment.format("YYYY-MM-DD"), "price": averagePrice};
 
         console.log("mpfPriceRecord: " + JSON.stringify(mpfPriceRecord));
 
     } catch (e) {
-        console.error("Unable to query. Error:", JSON.stringify(err, null, 2));
+        console.error("Unable to query. Error:", JSON.stringify(e, null, 2));
     }
 
     return mpfPriceRecord;
 }
 
-async function saveFundPrice(fundPriceRecord, tableName) {
+async function calculateAllPerformance(fundPriceRecord) {
 
-    if (!tableName) {
-        tableName = DEFAULT_MONTHLY_TABLE_NAME;
-    }
-  
-    if (!fundPriceRecord.trusteeSchemeFundId) {
-        fundPriceRecord.trusteeSchemeFundId = fundPriceRecord.trustee + "-" + fundPriceRecord.scheme + "-" + fundPriceRecord.fundName;
-    }
-  
-    let params = {
-        TableName: tableName,
-        Item: fundPriceRecord
-    };
-    console.log("Calling PutItem");
-    console.log(JSON.stringify(params));
-  
-    let result = new Promise((resolve, reject) =>  {
-        
-        docClient.put(params, function(err, data) {
-            if (err)  { 
-                console.error(err); // an error occurred
-                reject(err);
-            }
-            else { 
-                console.log("PutItem returned successfully");
-                resolve(fundPriceRecord.trusteeSchemeFundId);
-            }
+    let newPriceRecord = {...fundPriceRecord};
+
+    // Calculate average price for 1 month
+    let month1Performance = await calculatePerformance(newPriceRecord, 1);
+    newPriceRecord.month1Growth = month1Performance;
+
+    // Calculate average price for 3 month
+    let month3Performance = await calculatePerformance(newPriceRecord, 3);
+    newPriceRecord.month3Growth = month3Performance;
+
+    // Calculate avarage price for 6 month
+    let month6Performance = await calculatePerformance(newPriceRecord, 6);
+    newPriceRecord.month6Growth = month6Performance;
+
+    // Calculate average price for 12 month
+    let month12Performance = await calculatePerformance(newPriceRecord, 12);
+    newPriceRecord.month12Growth = month12Performance;
+
+    return newPriceRecord;
+
+}
+
+async function calculatePerformance(fundPriceRecord, noOfMonth) {
+
+    let endOfDateMoment = moment(fundPriceRecord.priceDate).startOf('week');
+    let startOfDateMoment = moment(endOfDateMoment).subtract(noOfMonth, 'months').startOf('week');
+    let averagePrice = await calculateAveragePriceForWeeklyPeriod(fundPriceRecord.trusteeSchemeFundId, startOfDateMoment.valueOf(), endOfDateMoment.valueOf(), fundPriceRecord);
+
+    console.log(averagePrice);
+    let performance = (fundPriceRecord.price - averagePrice) / averagePrice;
+    console.log("calculatePerformance() - performance = " + performance + ", fundPriceRecord.price = " + fundPriceRecord.price  + ", averagePrice = " + averagePrice );
+
+    return performance;
+}
+
+async function calculateAveragePriceForWeeklyPeriod(trusteeSchemeFundId, startDate, endDate, fundPriceRecordToAdd) {
+
+    console.log("calculateAveragePriceForWeeklyPeriod() - trusteeSchemeFundId = " + trusteeSchemeFundId + ", startDate = " + moment(startDate).format('YYYY-MM-DD') + ", endDate = " + moment(endDate).format('YYYY-MM-DD'));
+    
+ 
+    let mpfPriceRecord = {};
+    let sum = 0;
+    let count = 0;
+    let averagePrice = 0;
+
+
+    try {
+
+        const retrievedPrices = await dataAccess.retrieveFundPriceByDate("W", trusteeSchemeFundId, startDate, endDate);
+        console.log("calculateAveragePriceForWeeklyPeriod() - Query succeeded.");
+        retrievedPrices.forEach(function(item) {
+            // console.log(JSON.stringify(item));
+            sum = sum + +item.price;
+            count++;
         });
-    });
-  
-    return await result;
-  
-  }
+
+        if (fundPriceRecordToAdd) {
+            count++;
+            sum += fundPriceRecordToAdd.price; 
+        }
+
+        if (count > 0) averagePrice = sum / count;
+        console.log("calculateAveragePriceForWeeklyPeriod() - average price = " + averagePrice + ", count = " + count + ", sum = " + sum);
+        
+    } catch (e) {
+        console.error("Unable to query. Error:", JSON.stringify(e, null, 2));
+    }
+
+    return averagePrice;
+}

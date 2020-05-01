@@ -158,13 +158,17 @@ module.exports.fundPrice = async event => {
   }
 }
 
+const ALLOWED_ORGIN = [
+  'https://mpf-price-app.web.app',
+  'https://localhost'
+];
 
 function prepareResponse(statusCode, body) {
 
   return {
     statusCode: statusCode,
     headers: {
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': origin,
       'Access-Control-Allow-Credentials': true,
       'Content-Type': "application/json"
     },

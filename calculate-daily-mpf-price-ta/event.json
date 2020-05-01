@@ -1,22 +1,22 @@
-{ "Records": [ 
-      { 
-            "EventSource": "aws:sns", 
-            "EventVersion": "1.0", 
-            "EventSubscriptionArn": "arn:aws:sns:us-east-2:041740121314:mpf-price-service-mpf-price-daily-update-topic-dev:1e0cefd9-c5f2-48f9-9a60-2f28a5b9c127", 
-            "Sns": 
-            { 
-                  "Type": "Notification", 
-                  "MessageId": "9c5da0e1-a5c9-523e-a06e-f5d4ec1871cd", 
-                  "TopicArn": "arn:aws:sns:us-east-2:041740121314:mpf-price-service-mpf-price-daily-update-topic-dev", 
-                  "Subject": null, 
-                  "Message": "{\"trusteeSchemeFundId\":\"HSBC-SuperTrust Plus-Balanced Fund\",\"priceDate\":1414540800000}", 
-                  "Timestamp": "2019-04-20T16:23:45.792Z", 
-                  "SignatureVersion": "1", 
-                  "Signature": "CNFbf7fgRf734H3MJlep2NAl9JdPtH0IJQEtBF0AVj7S4C8NPjcftdOb6ENcq+LGxP8oMUjX7egX6R+h6e5T59Ux0i6BIEVLqbo/vQOBaip/fSjX8emlJloRZgGllUlRReBfCiTi6xRmVPvHoy9bj+zVq0hN99W0E2M5AbL5O1jqvchcs4CPCogH4mN/oaK1m3+KFPrlNw9jdX5t6Q2CQ6xhFivGg4G8rJh03RKT+skw8nUwaLpqdT/JiVEmVjsd5tIgKfBNAdzYuSW9cWBdfp3M7SlVtQxCerOmFPW99h7BKxpBwGRIjlTAKNGgC6ukOL6M4oL5h8pd+m3CtUzpZg==", 
-                  "SigningCertUrl": "https://sns.us-east-2.amazonaws.com/SimpleNotificationService-6aad65c2f9911b05cd53efda11f913f9.pem", 
-                  "UnsubscribeUrl": "https://sns.us-east-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-2:041740121314:mpf-price-service-mpf-price-daily-update-topic-dev:1e0cefd9-c5f2-48f9-9a60-2f28a5b9c127", 
-                  "MessageAttributes": {} 
-            } 
-      } 
-] 
+{
+      "Records": [
+          {
+              "EventSource": "aws:sns",
+              "EventVersion": "1.0",
+              "EventSubscriptionArn": "arn:aws:sns:us-east-2:041740121314:mpf-price-service-mpf-price-daily-update-topic-dev:4191bc8c-1905-40a5-b913-adb7db9469b8",
+              "Sns": {
+                  "Type": "Notification",
+                  "MessageId": "8a154812-f46f-58b2-a637-1f3136930380",
+                  "TopicArn": "arn:aws:sns:us-east-2:041740121314:mpf-price-service-mpf-price-daily-update-topic-dev",
+                  "Subject": null,
+                  "Message": "{\"trusteeSchemeFundId\":\"HSBC-SuperTrust Plus-Core Accumulation Fund\",\"priceDate\":1586995200000}",
+                  "Timestamp": "2020-04-29T18:00:28.440Z",
+                  "SignatureVersion": "1",
+                  "Signature": "n1Fm+r4TApx7DFwHr5TB36zFup+Wna0PrnC+tm2zBifGARAFYTCGu+GCprrSGjYx0JGSKSPrQy7M6Dnr7zTrllQYdw7nIERTLaMZW94Ib/tEbqUtNsOeCVAkVpuhhdQLPqTPo6eVA60JhpJPcc0WWYUYnUE2rg3kPYEsMXamhYCzLAR3kd2B83CYZUxfeX+dDmjoEdvTN8pNkrhaHlrRIMMAv4GL3i8X/yC/3X1jz7LiEcILWMAqvLu2lILJ/oK1hkpBBwgW4lZlS3hLb4hV+SA5CvCrZVzVyl/PjPNNuNVf5CRM5eR4052bkHQrJxIp187mkdCCgw6AJWMHyik+Cw==",
+                  "SigningCertUrl": "https://sns.us-east-2.amazonaws.com/SimpleNotificationService-a86cb10b4e1f29c941702d737128f7b6.pem",
+                  "UnsubscribeUrl": "https://sns.us-east-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-2:041740121314:mpf-price-service-mpf-price-daily-update-topic-dev:4191bc8c-1905-40a5-b913-adb7db9469b8",
+                  "MessageAttributes": {}
+              }
+          }
+      ]
 }
